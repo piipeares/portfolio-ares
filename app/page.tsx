@@ -22,7 +22,7 @@ const translations = {
     engine: "MOTOR: ACTIVO",
     viewProject: "Ver proyecto completo",
     projectsTitle: "Proyectos Seleccionados",
-    portfolioYear: "Portfolio / 2024",
+    portfolioYear: "Portfolio",
     aboutTitle: "Conóceme mejor",
     aboutBio1: "Desarrollador Multimedial bilingüe con experiencia en análisis y mantenimiento de sistemas, DTP y creación de contenido. Manejo herramientas de diseño varias con conocimiento sólido en UX & UI y desarrollo web.",
     aboutBio2: "Actualmente cursando el cuarto año de la Licenciatura en Tecnología Multimedial en la Universidad Maimónides, combinando creatividad con precisión técnica.",
@@ -35,12 +35,12 @@ const translations = {
     back: "Volver al portfolio",
     nextProject: "Siguiente proyecto",
     portfolio: "Portfolio",
-    projectPrefix: "PROYECTO",
+    projectPrefix: "",
     viewInteractive: "Ver modelo interactivo",
-    gallery: "Galería de capturas",
+    gallery: "Galería",
     allProjects: "Todos los proyectos",
     githubUrl: "https://github.com",
-    linkedinUrl: "https://linkedin.com/in/felipeares",
+    linkedinUrl: "https://www.linkedin.com/in/felipejarespacheco/",
   },
   en: {
     about: "About Me",
@@ -55,7 +55,7 @@ const translations = {
     engine: "ENGINE: ACTIVE",
     viewProject: "View full project",
     projectsTitle: "Selected Works",
-    portfolioYear: "Portfolio / 2024",
+    portfolioYear: "Portfolio",
     aboutTitle: "Get to know me",
     aboutBio1: "Bilingual Multimedia Developer with experience in systems analysis, DTP, and content creation. Solid knowledge in UX & UI and web development.",
     aboutBio2: "Currently in my fourth year of a Bachelor's in Multimedia Technology at Maimónides University, blending creativity with technical precision.",
@@ -68,12 +68,12 @@ const translations = {
     back: "Back to portfolio",
     nextProject: "Next project",
     portfolio: "Portfolio",
-    projectPrefix: "PROJECT",
+    projectPrefix: "",
     viewInteractive: "View interactive model",
-    gallery: "Project gallery",
+    gallery: "Gallery",
     allProjects: "View all projects",
     githubUrl: "https://github.com",
-    linkedinUrl: "https://linkedin.com/in/felipeares",
+    linkedinUrl: "https://www.linkedin.com/in/felipejarespacheco/",
   }
 };
 
@@ -94,19 +94,6 @@ const PROJECTS_DATA = [
   },
   {
     id: "02",
-    title: "Urban Reflections",
-    category: "Photography",
-    description: "Capturas de arquitectura urbana con contrastes de luz y sombra.",
-    tools: ["Canon EOS R5", "Lightroom"],
-    year: "2024",
-    image: "https://images.unsplash.com/photo-1449156001931-8283327360e3?q=80&w=2070&auto=format&fit=crop",
-    gallery: [
-      "https://images.unsplash.com/photo-1449156001931-8283327360e3?q=80&w=2070&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1444723121867-7a241cacace9?q=80&w=2070&auto=format&fit=crop"
-    ]
-  },
-  {
-    id: "03",
     title: "Vertex Identity",
     category: "Branding & UI",
     description: "Sistema de identidad visual para una startup tech.",
@@ -119,7 +106,7 @@ const PROJECTS_DATA = [
     ]
   },
   {
-    id: "04",
+    id: "03",
     title: "Kinetic Type",
     category: "Motion Graphics",
     description: "Secuencia de títulos con tipografía cinética para corto animado.",
@@ -132,7 +119,7 @@ const PROJECTS_DATA = [
     ]
   },
   {
-    id: "05",
+    id: "04",
     title: "Umaiverse",
     category: "Full Project",
     description: "Proyecto final de carrera - Ecosistema digital interactivo.",
@@ -211,7 +198,7 @@ const BackgroundBlob = ({ color, initialPos, mousePos, speed = 20 }: { color: st
 const SkillBadge = ({ name }: { name: string }) => (
   <motion.span 
     whileHover={{ scale: 1.05, borderColor: "rgba(217,70,239,0.5)", backgroundColor: "rgba(217,70,239,0.05)" }}
-    className="text-[9px] font-black uppercase tracking-widest px-3 py-1.5 bg-white/[0.03] border border-white/10 rounded-lg text-zinc-400 hover:text-white transition-colors cursor-default"
+    className="text-[11px] font-black uppercase tracking-widest px-4 py-2 bg-white/[0.03] border border-white/10 rounded-lg text-zinc-400 hover:text-white transition-colors cursor-default"
   >
     {name}
   </motion.span>
@@ -219,12 +206,11 @@ const SkillBadge = ({ name }: { name: string }) => (
 
 const InfoBlock = ({ title, subtitle, period, description }: { title: string, subtitle: string, period?: string, description?: string }) => (
   <div className="group border-l border-white/5 pl-6 py-4 hover:border-violet-500/50 transition-colors">
-    <div className="flex justify-between items-start mb-1 gap-4">
-      <h4 className="text-sm font-display font-bold uppercase tracking-tight group-hover:text-violet-400 transition-colors">{title}</h4>
-      {period && <span className="text-[9px] font-mono text-zinc-600 mt-1">{period}</span>}
+    <div className="flex justify-between items-start mb-2 gap-4">
+      <h4 className="text-xl font-display font-bold uppercase tracking-tight group-hover:text-violet-400 transition-colors">{title}</h4>
+      {period && <span className="text-[12px] font-mono text-zinc-500 mt-1 shrink-0">{period}</span>}
     </div>
-    <p className="text-[10px] font-mono text-zinc-400 mb-2">{subtitle}</p>
-    {description && <p className="text-xs text-zinc-500 leading-relaxed max-w-xl">{description}</p>}
+    <p className="text-[14px] md:text-[15px] font-mono text-zinc-400 leading-relaxed max-w-2xl">{subtitle}</p>
   </div>
 );
 
@@ -346,7 +332,6 @@ const ZoomImage = ({ src, alt, allowZoom = false, showIndicator = false }: { src
 
 const ProjectDetail = ({ project, onBack, onNext, t }: { project: typeof PROJECTS_DATA[0], onBack: () => void, onNext: () => void, t: any }) => {
   const [viewGalleryMode, setViewGalleryMode] = useState(false);
-  const is3D = project.category === "3D Rendering";
 
   useEffect(() => {
     if (viewGalleryMode) {
@@ -379,140 +364,115 @@ const ProjectDetail = ({ project, onBack, onNext, t }: { project: typeof PROJECT
         <span className="text-[10px] font-mono text-zinc-700 tracking-[0.5em] hidden lg:block uppercase">{project.category} // {project.year}</span>
       </header>
 
-      <div className="max-w-6xl mx-auto px-6 py-12 md:py-20 flex flex-col gap-20">
+      <div className="max-w-4xl mx-auto px-6 py-12 md:py-20 flex flex-col gap-20">
         
-        {/* TOP SECTION: Information First */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-start">
-          <div className="lg:col-span-5">
-             <div className="flex items-center gap-4 mb-6 font-mono font-bold text-fuchsia-500 text-[10px] uppercase tracking-[0.5em]">
-                <div className="w-8 h-[1px] bg-fuchsia-500/40" />
-                INFO_DATA {project.id}
-             </div>
-             <h2 className="text-5xl md:text-8xl font-display font-black uppercase tracking-tighter leading-[0.85] mb-12">{project.title}</h2>
+        {/* INFO SECTION - First */}
+        <div className="flex flex-col gap-8">
+           <div className="flex items-center gap-4 font-mono font-bold text-fuchsia-500 text-[10px] uppercase tracking-[0.5em]">
+             <div className="w-8 h-[1px] bg-fuchsia-500/40" />
+             INFO_DATA {project.id}
+           </div>
+           
+           <h2 className="text-5xl md:text-7xl font-display font-black uppercase tracking-tighter leading-[0.9]">{project.title}</h2>
+           
+           {/* Tools */}
+           <div>
+              <h4 className="text-[10px] font-mono font-black text-zinc-600 uppercase tracking-[0.4em] mb-4">Herramientas</h4>
+              <div className="flex flex-wrap gap-2">
+                 {project.tools.map(tool => <SkillBadge key={tool} name={tool} />)}
+              </div>
+           </div>
+           
+           {/* Description */}
+           <div>
+              <h4 className="text-[10px] font-mono font-black text-zinc-600 uppercase tracking-[0.4em] mb-4">Descripción</h4>
+              <p className="text-zinc-400 text-lg leading-relaxed">{project.description}</p>
+           </div>
+        </div>
+
+        {/* GALLERY SECTION - Clickable to open gallery */}
+        <div className="flex flex-col gap-6">
+           <h3 className="text-[10px] font-mono font-black text-zinc-600 uppercase tracking-[0.5em]">{t.gallery}</h3>
+           
+           <div 
+             onClick={() => setViewGalleryMode(true)}
+             className="relative rounded-[2rem] overflow-hidden bg-zinc-900 border border-white/5 cursor-pointer group"
+           >
+             {/* Show first image */}
+             <img 
+               src={project.gallery?.[0] || project.image} 
+               alt={`${project.title} gallery`} 
+               className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-700 opacity-80 group-hover:opacity-100" 
+             />
              
-             <div className="flex flex-col gap-10">
-                <div>
-                   <h4 className="text-[9px] font-mono font-black text-zinc-700 uppercase tracking-[0.4em] mb-4">Technical Stack</h4>
-                   <div className="flex flex-wrap gap-2">
-                      {project.tools.map(tool => <SkillBadge key={tool} name={tool} />)}
-                   </div>
-                </div>
-                
-                <div>
-                   <h4 className="text-[9px] font-mono font-black text-zinc-700 uppercase tracking-[0.4em] mb-4">Core Vision</h4>
-                   <p className="text-zinc-400 text-lg leading-relaxed">{project.description}</p>
-                </div>
+             {/* Show count badge */}
+             {project.gallery && project.gallery.length > 1 && (
+               <div className="absolute bottom-6 right-6 px-4 py-2 bg-black/60 backdrop-blur-xl border border-white/10 rounded-full flex items-center gap-2">
+                 <Maximize2 size={12} className="text-fuchsia-500" />
+                 <span className="text-[9px] font-black uppercase tracking-widest">{project.gallery.length} fotos</span>
+               </div>
+             )}
+             
+             {/* Hover overlay */}
+             <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+               <span className="text-[10px] font-black uppercase tracking-[0.5em] text-white">{t.gallery}</span>
              </div>
-          </div>
-
-          <div className="lg:col-span-7">
-             <div className="flex flex-col gap-6">
-                <div 
-                  onClick={() => setViewGalleryMode(true)}
-                  className="relative aspect-video rounded-[2.5rem] overflow-hidden bg-zinc-900 border border-white/5 group cursor-pointer"
-                >
-                  <img src={project.image} alt={project.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000 opacity-60 group-hover:opacity-80" />
-                  
-                  {/* Hover Indicator */}
-                  <div className="absolute inset-0 flex items-center justify-center bg-fuchsia-500/10 opacity-0 group-hover:opacity-100 backdrop-blur-sm transition-all duration-500">
-                    <div className="flex flex-col items-center gap-4">
-                       <div className="w-16 h-16 rounded-full border border-white/20 flex items-center justify-center bg-black/40">
-                          <Maximize2 size={24} className="text-white" />
-                       </div>
-                       <span className="text-[10px] font-black uppercase tracking-[0.5em] text-white">Ver galería de fotos ({project.gallery?.length})</span>
-                    </div>
-                  </div>
-                </div>
-
-                {is3D && (
-                   <div className="p-10 rounded-[2.5rem] bg-zinc-900/40 border border-white/5 flex flex-col gap-8">
-                      <div className="flex justify-between items-end">
-                         <div>
-                            <h3 className="text-2xl font-display font-black uppercase tracking-tighter">Engine Visualizer</h3>
-                            <p className="text-zinc-600 text-[10px] font-bold uppercase tracking-widest">Interactive 3D Asset Exploration</p>
-                         </div>
-                         <div className="w-12 h-12 rounded-full border border-violet-500/30 flex items-center justify-center text-violet-400">
-                            <Zap size={18} />
-                         </div>
-                      </div>
-                      <div className="aspect-video bg-black rounded-3xl border border-white/5 flex items-center justify-center">
-                         <div className="flex flex-col items-center gap-4">
-                            <div className="w-12 h-12 border-t-2 border-fuchsia-500 rounded-full animate-spin" />
-                            <span className="text-[8px] font-mono text-zinc-800 uppercase tracking-[0.5em]">Starting WebGL Engine...</span>
-                         </div>
-                      </div>
-                   </div>
-                )}
-             </div>
-          </div>
+           </div>
         </div>
 
         {/* Footer Navigation */}
-        <div className="mt-20 pt-20 border-t border-white/5 flex justify-between items-center bg-black">
+        <div className="mt-10 pt-10 border-t border-white/5 flex justify-between items-center">
           <button onClick={onBack} className="text-zinc-600 hover:text-white transition-colors flex items-center gap-4 text-[10px] font-black uppercase tracking-widest">
             <ChevronLeft size={16} />
             {t.portfolio}
           </button>
           
-          <button onClick={onNext} className="flex items-center gap-8 group">
+          <button onClick={onNext} className="flex items-center gap-4 group">
             <div className="text-right">
-              <span className="block text-[8px] font-mono text-zinc-600 uppercase tracking-widest mb-1">{t.nextProject}</span>
-              <span className="text-2xl md:text-5xl font-display font-black uppercase tracking-tighter group-hover:text-fuchsia-500 transition-all leading-none">
-              {t.projectPrefix}_{t.nextProject}
+              <span className="text-sm md:text-base font-display font-black uppercase tracking-tighter group-hover:text-fuchsia-500 transition-all leading-none">
+              {t.nextProject}
             </span>
             </div>
-            <div className="w-16 h-16 md:w-20 md:h-20 rounded-full border border-white/10 flex items-center justify-center group-hover:bg-fuchsia-500 group-hover:border-fuchsia-500 group-hover:text-black transition-all">
-              <ChevronRight size={24} />
+            <div className="w-10 h-10 md:w-12 md:h-12 rounded-full border border-white/10 flex items-center justify-center group-hover:bg-fuchsia-500 group-hover:border-fuchsia-500 group-hover:text-black transition-all">
+              <ChevronRight size={16} />
             </div>
           </button>
         </div>
       </div>
 
-      {/* OVERLAY GALLERY VIEWPORT (Page-like) */}
+      {/* GALLERY OVERLAY */}
       <AnimatePresence>
         {viewGalleryMode && (
           <motion.div 
-            initial={{ x: "100%" }}
-            animate={{ x: 0 }}
-            exit={{ x: "100%" }}
-            transition={{ type: "spring", damping: 30, stiffness: 200 }}
-            className="fixed inset-0 z-[200] bg-zinc-950 overflow-y-auto"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="fixed inset-0 z-[200] bg-black overflow-y-auto"
           >
-            <header className="sticky top-0 z-[210] flex justify-between items-center px-6 md:px-16 py-8 bg-zinc-950/95 backdrop-blur-xl border-b border-white/5">
+            <header className="sticky top-0 z-[210] flex justify-between items-center px-6 md:px-16 py-6 bg-black/95 backdrop-blur-xl border-b border-white/5">
                <button 
                 onClick={() => setViewGalleryMode(false)}
                 className="flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.3em] text-zinc-400 hover:text-white transition-colors"
               >
                 <ChevronLeft size={18} />
-                <span>Cerrar galería</span>
+                <span>Volver</span>
               </button>
-              <span className="text-[10px] font-mono font-bold text-zinc-700 uppercase tracking-[0.5em]">{project.title} // Assets Gallery</span>
+              <span className="text-[10px] font-mono font-bold text-zinc-700 uppercase tracking-[0.5em]">{project.title} // {t.gallery}</span>
             </header>
 
-            <div className="max-w-5xl mx-auto px-6 py-20 flex flex-col gap-12">
-               {project.gallery?.map((img, i) => (
-                 <motion.div 
-                   key={i} 
-                   initial={{ opacity: 0, y: 30 }}
-                   whileInView={{ opacity: 1, y: 0 }}
-                   viewport={{ once: true }}
-                   className="flex flex-col gap-4 group"
-                 >
-                    <div className="aspect-video rounded-[2.5rem] overflow-hidden border border-white/10 bg-zinc-900 group">
-                       <ZoomImage src={img} alt={`Asset ${i}`} allowZoom={true} showIndicator={i === 0} />
-                    </div>
-                 </motion.div>
-               ))}
-
-               <div className="py-20 flex flex-col items-center gap-6">
-                  <div className="w-12 h-[1px] bg-zinc-900" />
-                  <button 
-                    onClick={() => setViewGalleryMode(false)}
-                    className="px-10 py-5 bg-white text-black rounded-2xl font-black uppercase text-[10px] tracking-[0.4em] hover:scale-105 transition-transform"
+            <div className="max-w-5xl mx-auto px-6 py-12 flex flex-col gap-8">
+{project.gallery?.map((img, i) => (
+                  <motion.div 
+                    key={i}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.1 }}
+                    className="rounded-[2rem] overflow-hidden border border-white/10 bg-zinc-900"
                   >
-                    Volver a los detalles
-                  </button>
-               </div>
+                    <ZoomImage src={img} alt={`${project.title} ${i + 1}`} allowZoom={true} showIndicator={true} />
+                  </motion.div>
+                ))}
             </div>
           </motion.div>
         )}
@@ -535,9 +495,16 @@ export default function App() {
 
   useEffect(() => {
     if (selectedProjectId) {
+      // Guardar posición actual antes de abrir proyecto
+      window.sessionStorage.setItem('homeScrollPosition', window.scrollY.toString());
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "unset";
+      // Restaurar posición al volver
+      const savedPosition = window.sessionStorage.getItem('homeScrollPosition');
+      if (savedPosition) {
+        window.scrollTo({ top: parseInt(savedPosition), behavior: 'instant' });
+      }
     }
     return () => { document.body.style.overflow = "unset"; };
   }, [selectedProjectId]);
@@ -547,7 +514,7 @@ export default function App() {
     const currentIndex = PROJECTS_DATA.findIndex(p => p.id === selectedProjectId);
     const nextIndex = (currentIndex + 1) % PROJECTS_DATA.length;
     setSelectedProjectId(PROJECTS_DATA[nextIndex].id);
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    // No hacemos scrollTo aquí porque el body tiene overflow:hidden
   };
 
   useEffect(() => {
@@ -565,7 +532,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#000000] text-white font-sans overflow-x-hidden flex flex-col relative selection:bg-violet-500/40">
+    <div className={`min-h-screen bg-[#000000] text-white font-sans flex flex-col relative selection:bg-violet-500/40 ${selectedProjectId ? 'h-screen overflow-hidden fixed inset-0' : 'overflow-x-hidden'}`}>
       {/* 
         ORGANIC DYNAMIC BACKGROUND
       */}
@@ -646,16 +613,18 @@ export default function App() {
           </motion.div>
           </div>
 
-          {/* CTA + Scroll Indicator Container */}
+{/* CTA + Scroll Indicator Container */}
           <div className="flex flex-col items-center gap-8 mt-6">
             <div className="relative group mx-auto w-fit">
-<MagneticButton 
+              <div className="absolute -inset-1 bg-gradient-to-r from-violet-500 to-fuchsia-500 rounded-[2.5rem] blur opacity-20 group-hover:opacity-60 transition duration-1000 group-hover:duration-200" />
+              <MagneticButton 
                 onClick={scrollToProjects}
-                className="relative z-10 flex items-center gap-5 bg-zinc-900/60 border border-white/20 hover:border-fuchsia-500/50 px-12 py-6 rounded-2xl text-[11px] font-black uppercase tracking-[0.4em] backdrop-blur-xl transition-all hover:shadow-[0_20px_100px_rgba(217,70,239,0.15)] group overflow-hidden"
+                className="relative flex items-center justify-center bg-black/60 border border-white/10 hover:border-fuchsia-500/50 px-16 py-8 rounded-2xl text-[11px] font-black uppercase tracking-[0.4em] backdrop-blur-xl transition-all hover:shadow-[0_20px_100px_rgba(217,70,239, 0.15)] group overflow-hidden"
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-                <span className="relative z-20 group-hover:text-white text-zinc-200 transition-colors uppercase">{t.cta}</span>
-                <ArrowDown size={16} strokeWidth={3} className="text-fuchsia-500 group-hover:translate-y-1 transition-transform" />
+                <span className="relative z-10 group-hover:text-fuchsia-500 transition-colors duration-500 uppercase">
+                  {t.cta}
+                </span>
               </MagneticButton>
             </div>
 
@@ -698,83 +667,78 @@ export default function App() {
       </section>
 
       {/* About Section */}
-      <section id="about" className="relative z-10 py-32 px-6 md:px-16 max-w-7xl mx-auto border-t border-white/5">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-20">
-          <div>
-            <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} className="flex flex-col gap-6">
-              <div className="inline-flex items-center gap-3 px-3 py-1 bg-violet-500/10 border border-violet-500/20 w-fit rounded-full">
-                <div className="w-1 h-1 bg-violet-400 rounded-full" />
-                <span className="text-[8px] font-black uppercase tracking-widest text-violet-400">{t.about}</span>
-              </div>
-              <h2 className="text-5xl md:text-7xl font-display font-black uppercase tracking-tighter leading-none">{t.aboutTitle}</h2>
-              <div className="flex flex-col gap-8 mt-10">
-                <p className="text-xl md:text-2xl font-medium text-zinc-300 leading-tight">
-                  {t.aboutBio1}
-                </p>
-                <p className="text-sm text-zinc-500 leading-relaxed max-w-lg">
-                  {t.aboutBio2}
-                </p>
-              </div>
-            </motion.div>
-
-            <div className="mt-20">
-              <h3 className="text-[10px] font-mono font-black text-zinc-600 uppercase tracking-[0.5em] mb-10">{t.aptitudesTitle}</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                <div className="flex flex-col gap-3">
-                  <span className="text-[8px] font-mono text-zinc-700 uppercase tracking-widest">Base</span>
-                  <div className="flex flex-wrap gap-2">
-                    {SKILLS.aptitudes.map(s => <SkillBadge key={s} name={s} />)}
-                  </div>
-                </div>
-                <div className="flex flex-col gap-3">
-                  <span className="text-[8px] font-mono text-zinc-700 uppercase tracking-widest">Stack Dev</span>
-                  <div className="flex flex-wrap gap-2">
-                    {SKILLS.dev.map(s => <SkillBadge key={s} name={s} />)}
-                  </div>
-                </div>
-              </div>
-            </div>
+      <section id="about" className="relative z-10 py-32 px-6 md:px-16 max-w-5xl border-t border-white/5">
+        
+        {/* Header */}
+        <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} className="flex flex-col gap-4 mb-16">
+          <div className="inline-flex items-center gap-3 px-3 py-1 bg-violet-500/10 border border-violet-500/20 w-fit rounded-full">
+            <div className="w-1 h-1 bg-violet-400 rounded-full" />
+            <span className="text-[10px] font-black uppercase tracking-widest text-violet-400">{t.about}</span>
           </div>
+          <h2 className="text-6xl md:text-7xl font-display font-black uppercase tracking-tighter leading-none">{t.aboutTitle}</h2>
+        </motion.div>
 
-          <div className="flex flex-col gap-12 lg:pt-16">
-            <div>
-              <h3 className="text-[10px] font-mono font-black text-zinc-600 uppercase tracking-[0.5em] mb-8">{t.experienceTitle}</h3>
-              <div className="flex flex-col gap-6">
-                <InfoBlock 
-                  title="Analista Funcional y Técnico" 
-                  subtitle="Mercedes Benz - Boutique House" 
-                  period="SEP 2023 - PRESENTE"
-                  description="Análisis y mantenimiento de sistemas y páginas web."
-                />
-                <InfoBlock 
-                  title="Especialista en DTP - Freelance" 
-                  subtitle="Trusted Translations" 
-                  period="JUL 2024 - JUN 2025"
-                />
-                <InfoBlock 
-                  title="Asistente de Gestión de Proyectos" 
-                  subtitle="Translated" 
-                  period="MAR 2023 - AGO 2023"
-                />
-              </div>
-            </div>
+        {/* Bio */}
+        <div className="mb-20">
+          <p className="text-2xl md:text-3xl font-medium text-zinc-300 leading-relaxed mb-8">
+            {t.aboutBio1}
+          </p>
+          <p className="text-xl md:text-2xl text-zinc-500 leading-relaxed">
+            {t.aboutBio2}
+          </p>
+        </div>
 
-            <div>
-              <h3 className="text-[10px] font-mono font-black text-zinc-600 uppercase tracking-[0.5em] mb-8">{t.educationTitle}</h3>
-              <div className="flex flex-col gap-6">
-                <InfoBlock 
-                  title="Licenciatura en Tecnología Multimedial" 
-                  subtitle="Universidad Maimónides" 
-                  period="4TO AÑO EN CURSO"
-                />
-                <InfoBlock 
-                  title="Certificaciones" 
-                  subtitle="Cambridge B2 / UI UX Figma / Workshop Design"
-                />
-              </div>
-            </div>
+        {/* Aptitudes */}
+        <div className="mb-20">
+          <h3 className="text-[13px] font-mono font-black text-zinc-500 uppercase tracking-[0.5em] mb-6">{t.aptitudesTitle}</h3>
+          <div className="flex flex-wrap gap-2">
+            {[...SKILLS.aptitudes, ...SKILLS.dev].map(s => <SkillBadge key={s} name={s} />)}
           </div>
         </div>
+
+        {/* Experience */}
+        <div className="mb-20">
+          <h3 className="text-[12px] font-mono font-black text-zinc-500 uppercase tracking-[0.5em] mb-8">{t.experienceTitle}</h3>
+          <div className="flex flex-col gap-8">
+            <InfoBlock 
+              title="Mercedes Benz - Boutique House" 
+              subtitle="Soporte técnico y mantenimiento de páginas web y sistemas. Relevo, análisis y documentación de requerimientos funcionales." 
+              period="SEP 2023 - PRESENTE"
+            />
+            <InfoBlock 
+              title="Ghirardelli Chocolate Company" 
+              subtitle="Work & Travel – San Francisco, USA. Atención al cliente en entorno dinámico, manejo de caja, elaboración de productos y gestión de stock." 
+              period="DIC 2024 - MAR 2025"
+            />
+            <InfoBlock 
+              title="Trusted Translations" 
+              subtitle="Preparación y maquetación de archivos para herramientas CAT (InDesign, Photoshop, Office). QA en DTP asegurando calidad en proyectos multilingües." 
+              period="JUL 2024 - JUN 2025"
+            />
+            <InfoBlock 
+              title="Translated" 
+              subtitle="Asistente de Gestión de Proyectos. Respuestas rápidas y efectivas a requerimientos de PM y clientes." 
+              period="MAR 2023 - AGO 2023"
+            />
+          </div>
+        </div>
+
+        {/* Education */}
+        <div>
+          <h3 className="text-[12px] font-mono font-black text-zinc-500 uppercase tracking-[0.5em] mb-8">{t.educationTitle}</h3>
+          <div className="flex flex-col gap-8">
+            <InfoBlock 
+              title="Licenciatura en Tecnología Multimedial" 
+              subtitle="Universidad Maimónides" 
+              period="4TO AÑO EN CURSO"
+            />
+            <InfoBlock 
+              title="Certificaciones" 
+              subtitle="Cambridge B2 / UI UX Figma / Workshop Design"
+            />
+          </div>
+        </div>
+
       </section>
 
       {/* Contact Section */}
@@ -792,11 +756,10 @@ export default function App() {
           </p>
           
           <div className="flex flex-col items-center gap-10">
-            <div className="relative group">
-              <div className="absolute -inset-1 bg-gradient-to-r from-violet-500 to-fuchsia-500 rounded-[2.5rem] blur opacity-20 group-hover:opacity-60 transition duration-1000 group-hover:duration-200" />
-              <MagneticButton className="relative flex items-center justify-center bg-black/60 border border-white/10 hover:border-fuchsia-500/50 px-20 py-10 rounded-[2.5rem] text-2xl font-display font-black uppercase tracking-tighter backdrop-blur-3xl transition-all group overflow-hidden">
+            <div className="relative group mx-auto w-fit">
+              <MagneticButton className="relative flex items-center justify-center bg-zinc-900/60 border border-white/20 hover:border-fuchsia-500/50 px-16 py-8 rounded-2xl text-[11px] font-black uppercase tracking-[0.4em] backdrop-blur-xl transition-all hover:shadow-[0_20px_100px_rgba(217,70,239, 0.15)] group overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-                <span className="relative z-10 group-hover:text-fuchsia-500 transition-colors duration-500">
+                <span className="relative z-10 group-hover:text-fuchsia-500 transition-colors duration-500 uppercase">
                   {t.contactCta}
                 </span>
               </MagneticButton>
