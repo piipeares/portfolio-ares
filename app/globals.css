@@ -1,26 +1,57 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #000000;
+  --foreground: #ffffff;
+  --brand-violet: #8b5cf6;
+  --brand-fuchsia: #d946ef;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-brand-violet: var(--brand-violet);
+  --color-brand-fuchsia: var(--brand-fuchsia);
+  --font-display: var(--font-display);
+  --font-sans: var(--font-sans);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), sans-serif;
+}
+
+/* Custom utilities for text stroke effect */
+.text-stroke-white {
+  -webkit-text-stroke: 2px rgba(255, 255, 255, 0.4);
+  text-stroke: 2px rgba(255, 255, 255, 0.4);
+  color: transparent;
+}
+
+/* Gradient text animation */
+.animate-gradient-x {
+  animation: gradient-x 3s ease infinite;
+  background-size: 200% auto;
+}
+
+@keyframes gradient-x {
+  0%, 100% { background-position: 0% center; }
+  50% { background-position: 100% center; }
+}
+
+/* Glassmorphism */
+.glass {
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+/* Hide scrollbar but keep functionality */
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
 }
