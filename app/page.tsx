@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, useSpring, useMotionValue, useInView, useTransform, AnimatePresence } from "motion/react";
-import { ArrowDown, Mail, Languages as LangIcon, Zap, X, ChevronRight, ChevronLeft, Maximize2 } from "lucide-react";
+import { ArrowDown, Mail, Languages as LangIcon, Zap, X, ChevronRight, ChevronLeft, Maximize2, MessageCircle } from "lucide-react";
 import { useState, useEffect, useMemo, useRef } from "react";
 
 // --- Types & Translations ---
@@ -15,7 +15,8 @@ const translations = {
     status: "Disponible para proyectos",
     title: "Felipe Ares",
     lastName: "ARES",
-    role: "Desarrollador Multimedial",
+    role: "Diseñador UX / UI",
+    roleSub: "Desarrollo Multimedial",
     specs: ["Diseño UX/UI", "Desarrollo Web", "creatividad 3D"],
     cta: "Ver proyectos",
     scroll: "Bajar",
@@ -41,6 +42,7 @@ const translations = {
     allProjects: "Todos los proyectos",
     githubUrl: "https://github.com",
     linkedinUrl: "https://www.linkedin.com/in/felipejarespacheco/",
+    whatsappUrl: "https://wa.me/5491134206387",
   },
   en: {
     about: "About Me",
@@ -48,7 +50,8 @@ const translations = {
     status: "Available for projects",
     title: "Felipe Ares",
     lastName: "ARES",
-    role: "Multimedia Developer",
+    role: "UX / UI Designer",
+    roleSub: "Multimedia Development",
     specs: ["UX/UI Design", "Web Development", "3D Creativity"],
     cta: "View Projects",
     scroll: "Scroll",
@@ -74,6 +77,7 @@ const translations = {
     allProjects: "View all projects",
     githubUrl: "https://github.com",
     linkedinUrl: "https://www.linkedin.com/in/felipejarespacheco/",
+    whatsappUrl: "https://wa.me/5491134206387",
   }
 };
 
@@ -204,13 +208,14 @@ const SkillBadge = ({ name }: { name: string }) => (
   </motion.span>
 );
 
-const InfoBlock = ({ title, subtitle, period, description }: { title: string, subtitle: string, period?: string, description?: string }) => (
+const InfoBlock = ({ title, subtitle, period, details }: { title: string,subtitle: string, period?: string, details?: string }) => (
   <div className="group border-l border-white/5 pl-6 py-4 hover:border-violet-500/50 transition-colors">
-    <div className="flex justify-between items-start mb-2 gap-4">
-      <h4 className="text-xl font-display font-bold uppercase tracking-tight group-hover:text-violet-400 transition-colors">{title}</h4>
+    <div className="flex justify-between items-start mb-1 gap-4">
+      <h4 className="text-xl md:text-2xl font-display font-bold uppercase tracking-tight group-hover:text-violet-400 transition-colors">{title}</h4>
       {period && <span className="text-[12px] font-mono text-zinc-500 mt-1 shrink-0">{period}</span>}
     </div>
-    <p className="text-[14px] md:text-[15px] font-mono text-zinc-400 leading-relaxed max-w-2xl">{subtitle}</p>
+    <p className="text-[13px] md:text-[14px] font-mono text-fuchsia-400/80 mb-2">{subtitle}</p>
+    {details && <p className="text-[13px] md:text-[14px] font-mono text-zinc-400 leading-relaxed max-w-2xl">{details}</p>}
   </div>
 );
 
@@ -219,6 +224,14 @@ const SKILLS = {
   diseno: ["Adobe Creative Suite", "Figma", "Prototipado", "Principios de Accesibilidad", "Autodesk Maya"],
   dev: ["HTML / CSS", "JavaScript", "React / Next.js", "Three.js", "Tailwind CSS"]
 };
+
+const SKILLS_EN = {
+  aptitudes: ["Bilingual Communication", "Creativity", "Attention to Detail", "Versatility", "Fast Learning"],
+  diseno: ["Adobe Creative Suite", "Figma", "Prototyping", "Accessibility Principles", "Autodesk Maya"],
+  dev: ["HTML / CSS", "JavaScript", "React / Next.js", "Three.js", "Tailwind CSS"]
+};
+
+const getSkills = (lang: Language) => lang === "es" ? SKILLS : SKILLS_EN;
 
 const ProjectCard = ({ project, t, isLast, onClick }: { project: typeof PROJECTS_DATA[0], t: any, isLast: boolean, onClick: () => void }) => {
   const ref = useRef(null);
@@ -574,7 +587,7 @@ export default function App() {
       </header>
 
       {/* Hero Section */}
-      <section className="relative z-10 min-h-screen flex flex-col items-center justify-start pt-16 md:pt-20 pb-10 px-6">
+      <section className="relative z-10 min-h-screen flex flex-col items-center justify-start pt-10 md:pt-14 pb-10 px-6">
         <motion.div 
           initial={{ opacity: 0, scale: 0.98 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -588,7 +601,7 @@ export default function App() {
             <span className="text-[9px] font-black uppercase tracking-[0.4em] text-zinc-300">{t.status}</span>
           </motion.div>
 
-          {/* Main Title */}
+{/* Main Title */}
           <div className="mb-6 relative flex flex-col items-center">
             <motion.div
               initial={{ y: 20, opacity: 0 }}
@@ -596,7 +609,7 @@ export default function App() {
               transition={{ duration: 0.8, ease: "circOut" }}
               className="relative"
             >
-<h1 className="text-5xl md:text-7xl lg:text-9xl font-display font-extrabold tracking-tighter leading-[0.8] mb-1 uppercase">
+              <h1 className="text-5xl md:text-7xl lg:text-9xl font-display font-extrabold tracking-tighter leading-[0.8] mb-1 uppercase">
                 FELIPE <br />
                 <span className="text-stroke-white opacity-40">ARES</span>
               </h1>
@@ -605,15 +618,16 @@ export default function App() {
             <motion.div 
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="mt-2"
+              className="mt-2 flex flex-col items-center gap-1"
             >
               <h2 className="text-2xl md:text-3xl font-display font-extrabold uppercase tracking-tight bg-gradient-to-r from-violet-500 via-fuchsia-500 to-violet-500 bg-[length:200%_auto] bg-clip-text text-transparent animate-gradient-x">
                 {t.role}
               </h2>
-          </motion.div>
+              <span className="text-[12px] md:text-[13px] font-mono uppercase tracking-[0.3em] text-zinc-500">{t.roleSub}</span>
+</motion.div>
           </div>
 
-{/* CTA + Scroll Indicator Container */}
+          {/* CTA + Scroll */}
           <div className="flex flex-col items-center gap-8 mt-6">
             <div className="relative group mx-auto w-fit">
               <div className="absolute -inset-1 bg-gradient-to-r from-violet-500 to-fuchsia-500 rounded-[2.5rem] blur opacity-20 group-hover:opacity-60 transition duration-1000 group-hover:duration-200" />
@@ -628,7 +642,6 @@ export default function App() {
               </MagneticButton>
             </div>
 
-            {/* Scroll Interaction - Now below the CTA */}
             <div onClick={scrollToProjects} className="flex flex-col items-center gap-3 opacity-50 hover:opacity-80 transition-opacity cursor-pointer group">
               <span className="text-[9px] uppercase tracking-[1em] font-black text-zinc-400 ml-[1em]">{t.scroll}</span>
               <div className="w-[1px] h-10 bg-zinc-800 relative overflow-hidden">
@@ -692,33 +705,39 @@ export default function App() {
         <div className="mb-20">
           <h3 className="text-[13px] font-mono font-black text-zinc-500 uppercase tracking-[0.5em] mb-6">{t.aptitudesTitle}</h3>
           <div className="flex flex-wrap gap-2">
-            {[...SKILLS.aptitudes, ...SKILLS.dev].map(s => <SkillBadge key={s} name={s} />)}
+            {getSkills(lang).aptitudes.map(s => <SkillBadge key={s} name={s} />)}
+            {getSkills(lang).diseno.map(s => <SkillBadge key={s} name={s} />)}
+            {getSkills(lang).dev.map(s => <SkillBadge key={s} name={s} />)}
           </div>
         </div>
 
         {/* Experience */}
         <div className="mb-20">
           <h3 className="text-[12px] font-mono font-black text-zinc-500 uppercase tracking-[0.5em] mb-8">{t.experienceTitle}</h3>
-          <div className="flex flex-col gap-8">
+          <div className="flex flex-col gap-10">
             <InfoBlock 
-              title="Mercedes Benz - Boutique House" 
-              subtitle="Soporte técnico y mantenimiento de páginas web y sistemas. Relevo, análisis y documentación de requerimientos funcionales." 
+              title="Mercedes Benz - Boutique House"
+              subtitle={lang === "es" ? "Soporte técnico y mantenimiento de páginas web y sistemas" : "Technical support and maintenance of websites and systems"}
               period="SEP 2023 - PRESENTE"
+              details={lang === "es" ? "Interacción con bases de datos y servidores. Relevo, análisis y documentación de requerimientos funcionales." : "Interaction with databases and servers. Gathering, analysis, and documentation of functional requirements."}
             />
             <InfoBlock 
-              title="Ghirardelli Chocolate Company" 
-              subtitle="Work & Travel – San Francisco, USA. Atención al cliente en entorno dinámico, manejo de caja, elaboración de productos y gestión de stock." 
+              title="Ghirardelli Chocolate Company"
+              subtitle={lang === "es" ? "Work & Travel – San Francisco" : "Work & Travel – San Francisco"}
               period="DIC 2024 - MAR 2025"
+              details={lang === "es" ? "Atención al cliente en entorno dinámico, manejo de caja, elaboración de productos y gestión de stock." : "Customer service in a dynamic environment, cash register operation, product preparation and stock management."}
             />
             <InfoBlock 
-              title="Trusted Translations" 
-              subtitle="Preparación y maquetación de archivos para herramientas CAT (InDesign, Photoshop, Office). QA en DTP asegurando calidad en proyectos multilingües." 
+              title="Trusted Translations"
+              subtitle={lang === "es" ? "Especialista en DTP – Freelance" : "DTP Specialist – Freelance"}
               period="JUL 2024 - JUN 2025"
+              details={lang === "es" ? "Preparación y maquetación de archivos para herramientas CAT (InDesign, Photoshop, Office). QA en DTP asegurando calidad en proyectos multilingües. Respuestas rápidas a requerimientos de PM y clientes." : "Preparation and formatting of files for CAT tools (InDesign, Photoshop, Microsoft Office). DTP Quality Assurance to ensure quality and consistency across multilingual projects. Prompt response to Project Manager and client requests."}
             />
             <InfoBlock 
-              title="Translated" 
-              subtitle="Asistente de Gestión de Proyectos. Respuestas rápidas y efectivas a requerimientos de PM y clientes." 
+              title="Translated"
+              subtitle={lang === "es" ? "Asistente de gestión de Proyectos de traducción y DTP" : "Translation & DTP Project Management Assistant"}
               period="MAR 2023 - AGO 2023"
+              details={lang === "es" ? "Asignación y seguimiento de proyectos con equipos internacionales. Control de calidad de entregas en distintos idiomas." : "Assignment and monitoring of projects with international teams. Quality control of deliverables in multiple languages."}
             />
           </div>
         </div>
@@ -728,13 +747,13 @@ export default function App() {
           <h3 className="text-[12px] font-mono font-black text-zinc-500 uppercase tracking-[0.5em] mb-8">{t.educationTitle}</h3>
           <div className="flex flex-col gap-8">
             <InfoBlock 
-              title="Licenciatura en Tecnología Multimedial" 
+              title={lang === "es" ? "Licenciatura en Tecnología Multimedial" : "Bachelor's Degree in Multimedia Technologies"} 
               subtitle="Universidad Maimónides" 
-              period="4TO AÑO EN CURSO"
+              period={lang === "es" ? "4TO AÑO EN CURSO" : "4TH YEAR IN PROGRESS"}
             />
             <InfoBlock 
-              title="Certificaciones" 
-              subtitle="Cambridge B2 / UI UX Figma / Workshop Design"
+              title={lang === "es" ? "Certificaciones" : "Certifications"} 
+              subtitle={lang === "es" ? "Cambridge B2 / UI UX Figma / Workshop Design" : "Cambridge B2 / UI UX Figma / Workshop Design"}
             />
           </div>
         </div>
@@ -766,9 +785,12 @@ export default function App() {
             </div>
             
             <div className="flex flex-col items-center gap-2">
-               <span className="text-[10px] font-mono text-zinc-600 uppercase tracking-[0.4em] mb-2">{t.contact}</span>
-               <a href="mailto:felipearespacheco@gmail.com" className="text-sm font-mono text-white/40 hover:text-fuchsia-500 transition-colors">
+               <span className="text-[11px] font-mono text-zinc-500 uppercase tracking-[0.4em] mb-2">{t.contact}</span>
+               <a href="mailto:felipearespacheco@gmail.com" className="text-base font-mono text-white/50 hover:text-fuchsia-500 transition-colors">
                  felipearespacheco@gmail.com
+               </a>
+               <a href={t.whatsappUrl} target="_blank" rel="noopener noreferrer" className="text-base font-mono text-white/50 hover:text-fuchsia-500 transition-colors">
+                 +54 911 3420-6387
                </a>
             </div>
           </div>
@@ -778,30 +800,29 @@ export default function App() {
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60vw] h-[60vw] bg-violet-500/10 blur-[200px] rounded-full -z-10" />
       </section>
 
-      {/* Simplified HUD / Footer */}
+{/* Simplified HUD / Footer */}
       <footer className="relative z-30 flex flex-col items-center py-20 gap-12 bg-black">
-        <div className="flex items-center gap-12 text-[8px] font-mono font-bold text-zinc-800 uppercase tracking-[0.4em]">
+        <div className="flex items-center gap-16 text-[10px] font-mono font-bold text-zinc-800 uppercase tracking-[0.4em]">
           <div className="flex flex-col items-center gap-2">
             <span className="text-zinc-600">Built with</span>
-            <span className="text-zinc-500">React + Next.js + Motion</span>
+            <span className="text-zinc-500">Next.js + React + Motion + Tailwind</span>
           </div>
-          <div className="h-6 w-[1px] bg-zinc-900" />
+          <div className="h-8 w-[1px] bg-zinc-900" />
           <div className="flex flex-col items-center gap-2">
             <span className="text-zinc-600">Location</span>
-            <span className="text-zinc-500">BA / AR</span>
+            <span className="text-zinc-500">Buenos Aires, Argentina</span>
           </div>
         </div>
         
         <div className="flex flex-col items-center gap-4 text-zinc-500">
-           <div className="flex gap-10 text-zinc-700">
-<a href={t.githubUrl} target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-1.5 1.5-1.5 1.5 0 2.5 2 2.5-1.25.08-2.45-.25-3.5-1.5-1.25 1.5-2 2.5-2 3.5 0 3.5 3 5.5 6 5.5-.4.4-.8 1-1 1.5H9c-.2 0-.5-.25-1-1.5-.5.5-1 1-1.5 1.5v4Z"/></svg>
-              </a>
-              <a href={t.linkedinUrl} target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
-               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
-             </a>
+           <div className="flex gap-10 text-zinc-700 items-center">
+             <a href={t.linkedinUrl} target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+            </a>
+            <a href={t.whatsappUrl} target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
+              <MessageCircle size={16} />
+            </a>
            </div>
-           <span className="text-[6px] font-mono uppercase tracking-[0.5em] opacity-30 mt-4">© 2024 / FELIPE ARES PACHECO</span>
         </div>
       </footer>
 
