@@ -2,7 +2,15 @@
 
 import { motion, useSpring, useMotionValue, useInView, useTransform, AnimatePresence } from "motion/react";
 import { ArrowDown, Mail, Languages as LangIcon, Zap, X, ChevronRight, ChevronLeft, Maximize2, MessageCircle } from "lucide-react";
-import { useState, useEffect, useMemo, useRef } from "react";
+import { useState, useEffect, useMemo, useRef, useCallback, memo } from "react";
+import dynamic from "next/dynamic";
+
+const HeroScene = dynamic(() => import("@/components/hero/HeroScene"), {
+  ssr: false,
+  loading: () => null,
+});
+
+import CategorySlider from "@/components/projects/CategorySlider";
 
 // --- Types & Translations ---
 
@@ -24,7 +32,7 @@ const translations = {
     viewProject: "Ver proyecto completo",
     projectsTitle: "Proyectos Seleccionados",
     portfolioYear: "Portfolio",
-    aboutTitle: "Conóceme mejor",
+    aboutTitle: "Sobre Mí",
     aboutBio1: "Desarrollador Multimedial bilingüe con experiencia en análisis y mantenimiento de sistemas, DTP y creación de contenido. Manejo herramientas de diseño varias con conocimiento sólido en UX & UI y desarrollo web.",
     aboutBio2: "Actualmente cursando el cuarto año de la Licenciatura en Tecnología Multimedial en la Universidad Maimónides, combinando creatividad con precisión técnica.",
     aptitudesTitle: "Aptitudes",
@@ -33,13 +41,13 @@ const translations = {
     contactTitle: "¿Tenés un proyecto en mente?",
     contactSub: "Estoy siempre abiertos a explorar nuevas ideas y colaboraciones creativas.",
     contactCta: "Hablemos",
-    back: "Volver al portfolio",
+    back: "Volver al portafolio",
     nextProject: "Siguiente proyecto",
     portfolio: "Portfolio",
     projectPrefix: "",
     viewInteractive: "Ver modelo interactivo",
     gallery: "Galería",
-    allProjects: "Todos los proyectos",
+    allProjects: "Ver todos los proyectos",
     githubUrl: "https://github.com",
     linkedinUrl: "https://www.linkedin.com/in/felipejarespacheco/",
     whatsappUrl: "https://wa.me/5491134206387",
@@ -52,14 +60,14 @@ const translations = {
     lastName: "ARES",
     role: "UX / UI Designer",
     roleSub: "Multimedia Development",
-    specs: ["UX/UI Design", "Web Development", "3D Creativity"],
-    cta: "View Projects",
+    specs: ["UX/UI Design", "Web Development", "3D creativity"],
+    cta: "View projects",
     scroll: "Scroll",
     engine: "ENGINE: ACTIVE",
     viewProject: "View full project",
-    projectsTitle: "Selected Works",
+    projectsTitle: "Selected Projects",
     portfolioYear: "Portfolio",
-    aboutTitle: "Get to know me",
+    aboutTitle: "About Me",
     aboutBio1: "Bilingual Multimedia Developer with experience in systems analysis, DTP, and content creation. Solid knowledge in UX & UI and web development.",
     aboutBio2: "Currently in my fourth year of a Bachelor's in Multimedia Technology at Maimónides University, blending creativity with technical precision.",
     aptitudesTitle: "Skills",
@@ -136,15 +144,39 @@ const PROJECTS_DATA = [
   }
 ];
 
+// --- Category Filter ---
+const CATEGORIES = [
+  { id: "all", label: { es: "Todos", en: "All" } },
+  { id: "3d", label: { es: "Modelado 3D", en: "3D Modeling" } },
+  { id: "branding", label: { es: "Branding & UI", en: "Branding & UI" } },
+  { id: "motion", label: { es: "Motion Graphics", en: "Motion Graphics" } },
+  { id: "web", label: { es: "Desarrollo Web", en: "Web Development" } },
+] as const;
+
+const CATEGORY_FILTER: Record<string, (p: typeof PROJECTS_DATA[0]) => boolean> = {
+  all: () => true,
+  "3d": (p) => p.category.includes("3D"),
+  branding: (p) => p.category.includes("Branding"),
+  motion: (p) => p.category.includes("Motion"),
+  web: (p) => p.category.includes("Full") || p.tools.some(t => ["React", "Three.js"].includes(t)),
+};
+
 // --- Components ---
 
-const MagneticButton = ({ children, className, onClick }: { children: React.ReactNode, className?: string, onClick?: () => void }) => {
+const MagneticButton = memo(({ children, className, onClick }: { children: React.ReactNode, className?: string, onClick?: () => void }) => {
+  const [isMobile, setIsMobile] = useState(false);
+  
+  useEffect(() => {
+    setIsMobile(window.matchMedia('(max-width: 768px)').matches);
+  }, []);
+  
   const x = useMotionValue(0);
   const y = useMotionValue(0);
   const springX = useSpring(x, { stiffness: 150, damping: 15 });
   const springY = useSpring(y, { stiffness: 150, damping: 15 });
 
   const handleMouseMove = (e: React.MouseEvent<HTMLButtonElement>) => {
+    if (isMobile) return;
     const rect = e.currentTarget.getBoundingClientRect();
     const centerX = rect.left + rect.width / 2;
     const centerY = rect.top + rect.height / 2;
@@ -161,15 +193,15 @@ const MagneticButton = ({ children, className, onClick }: { children: React.Reac
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       onClick={onClick}
-      style={{ x: springX, y: springY }}
+      style={isMobile ? {} : { x: springX, y: springY }}
       className={className}
     >
       {children}
     </motion.button>
   );
-};
+});
 
-const BackgroundBlob = ({ color, initialPos, mousePos, speed = 20 }: { color: string, initialPos: { x: string, y: string }, mousePos: { x: number, y: number }, speed?: number }) => {
+const BackgroundBlob = memo(({ color, initialPos, mousePos, speed = 20 }: { color: string, initialPos: { x: string, y: string }, mousePos: { x: number, y: number }, speed?: number }) => {
   const blobX = useMotionValue(0);
   const blobY = useMotionValue(0);
   const springX = useSpring(blobX, { stiffness: 30, damping: 25 });
@@ -197,18 +229,18 @@ const BackgroundBlob = ({ color, initialPos, mousePos, speed = 20 }: { color: st
       }}
     />
   );
-};
+});
 
-const SkillBadge = ({ name }: { name: string }) => (
+const SkillBadge = memo(({ name }: { name: string }) => (
   <motion.span 
     whileHover={{ scale: 1.05, borderColor: "rgba(217,70,239,0.5)", backgroundColor: "rgba(217,70,239,0.05)" }}
     className="text-[11px] font-black uppercase tracking-widest px-4 py-2 bg-white/[0.03] border border-white/10 rounded-lg text-zinc-400 hover:text-white transition-colors cursor-default"
   >
     {name}
   </motion.span>
-);
+));
 
-const InfoBlock = ({ title, subtitle, period, details }: { title: string,subtitle: string, period?: string, details?: string }) => (
+const InfoBlock = memo(({ title, subtitle, period, details }: { title: string,subtitle: string, period?: string, details?: string }) => (
   <div className="group border-l border-white/5 pl-6 py-4 hover:border-violet-500/50 transition-colors">
     <div className="flex justify-between items-start mb-1 gap-4">
       <h4 className="text-xl md:text-2xl font-display font-bold uppercase tracking-tight group-hover:text-violet-400 transition-colors">{title}</h4>
@@ -217,7 +249,7 @@ const InfoBlock = ({ title, subtitle, period, details }: { title: string,subtitl
     <p className="text-[13px] md:text-[14px] font-mono text-fuchsia-400/80 mb-2">{subtitle}</p>
     {details && <p className="text-[13px] md:text-[14px] font-mono text-zinc-400 leading-relaxed max-w-2xl">{details}</p>}
   </div>
-);
+));
 
 const SKILLS = {
   aptitudes: ["Comunicación Bilingüe", "Creatividad", "Atención al detalle", "Versatilidad", "Aprendizaje Rápido"],
@@ -233,7 +265,7 @@ const SKILLS_EN = {
 
 const getSkills = (lang: Language) => lang === "es" ? SKILLS : SKILLS_EN;
 
-const ProjectCard = ({ project, t, isLast, onClick }: { project: typeof PROJECTS_DATA[0], t: any, isLast: boolean, onClick: () => void }) => {
+const ProjectCard = memo(({ project, t, isLast, onClick }: { project: typeof PROJECTS_DATA[0], t: any, isLast: boolean, onClick: () => void }) => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-10% 0px" });
 
@@ -297,7 +329,7 @@ const ProjectCard = ({ project, t, isLast, onClick }: { project: typeof PROJECTS
       <div className="absolute inset-0 z-20 pointer-events-none bg-gradient-to-tr from-transparent via-white/[0.02] to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out" />
     </motion.div>
   );
-};
+});
 
 const ZoomImage = ({ src, alt, allowZoom = false, showIndicator = false }: { src: string, alt: string, allowZoom?: boolean, showIndicator?: boolean }) => {
   const [isZoomActive, setIsZoomActive] = useState(false);
@@ -498,6 +530,8 @@ export default function App() {
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [lang, setLang] = useState<Language>("es");
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
+  const [activeCategory, setActiveCategory] = useState("all");
+  const [isMobile, setIsMobile] = useState(false);
   const projectsRef = useRef<HTMLElement>(null);
 
   const t = useMemo(() => translations[lang], [lang]);
@@ -505,6 +539,11 @@ export default function App() {
   const selectedProject = useMemo(() => 
     PROJECTS_DATA.find(p => p.id === selectedProjectId),
   [selectedProjectId]);
+
+  const filteredProjects = useMemo(
+    () => PROJECTS_DATA.filter(CATEGORY_FILTER[activeCategory] || CATEGORY_FILTER.all),
+    [activeCategory]
+  );
 
   useEffect(() => {
     if (selectedProjectId) {
@@ -531,18 +570,41 @@ export default function App() {
   };
 
   useEffect(() => {
+    const rafRef = { current: 0 };
+    const latest = { x: 0, y: 0 };
+
     const handleMouseMove = (e: MouseEvent) => {
-      setMousePos({ x: e.clientX, y: e.clientY });
+      latest.x = e.clientX;
+      latest.y = e.clientY;
+      // Solo actualiza estado UNA vez por frame (60fps) en vez de 240+ fps
+      if (!rafRef.current) {
+        rafRef.current = requestAnimationFrame(() => {
+          setMousePos({ x: latest.x, y: latest.y });
+          rafRef.current = 0;
+        });
+      }
     };
     window.addEventListener("mousemove", handleMouseMove);
-    return () => window.removeEventListener("mousemove", handleMouseMove);
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    };
   }, []);
 
-  const toggleLang = () => setLang(prev => prev === "es" ? "en" : "es");
+  useEffect(() => {
+    setIsMobile(window.innerWidth < 768);
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
-  const scrollToProjects = () => {
+  const toggleLang = useCallback(() => setLang(prev => prev === "es" ? "en" : "es"), []);
+
+  const scrollToProjects = useCallback(() => {
     projectsRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
+  }, []);
+
+  const handleBack = useCallback(() => setSelectedProjectId(null), []);
 
   return (
     <div className={`min-h-screen bg-[#000000] text-white font-sans flex flex-col relative selection:bg-violet-500/40 ${selectedProjectId ? 'h-screen overflow-hidden fixed inset-0' : 'overflow-x-hidden'}`}>
@@ -555,6 +617,11 @@ export default function App() {
         <BackgroundBlob color="bg-violet-600/40" initialPos={{ x: "-5%", y: "55%" }} mousePos={mousePos} speed={30} />
         
         <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.08] mix-blend-overlay"></div>
+      </div>
+
+      {/* 3D Scene — Wireframe Torus Knot */}
+      <div className="fixed inset-0 z-[1] pointer-events-none">
+        <HeroScene mousePosition={mousePos} />
       </div>
 
       {/* Navigation Header */}
@@ -587,7 +654,7 @@ export default function App() {
       </header>
 
       {/* Hero Section */}
-      <section className="relative z-10 min-h-screen flex flex-col items-center justify-start pt-10 md:pt-14 pb-10 px-6">
+      <section className="relative z-10 flex flex-col items-center justify-start pt-8 md:pt-12 pb-8 px-6 will-change-transform">
         <motion.div 
           initial={{ opacity: 0, scale: 0.98 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -602,7 +669,7 @@ export default function App() {
           </motion.div>
 
 {/* Main Title */}
-          <div className="mb-6 relative flex flex-col items-center">
+          <div className="mb-4 relative flex flex-col items-center">
             <motion.div
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
@@ -611,7 +678,7 @@ export default function App() {
             >
               <h1 className="text-5xl md:text-7xl lg:text-9xl font-display font-extrabold tracking-tighter leading-[0.8] mb-1 uppercase">
                 FELIPE <br />
-                <span className="text-stroke-white opacity-40">ARES</span>
+                <span className="text-stroke-white">ARES</span>
               </h1>
             </motion.div>
             
@@ -624,29 +691,29 @@ export default function App() {
                 {t.role}
               </h2>
               <span className="text-[12px] md:text-[13px] font-mono uppercase tracking-[0.3em] text-zinc-500">{t.roleSub}</span>
-</motion.div>
+            </motion.div>
           </div>
 
-          {/* CTA + Scroll */}
-          <div className="flex flex-col items-center gap-8 mt-6">
+{/* CTA + Scroll */}
+          <div className="flex flex-col items-center gap-6 mt-4 will-change-transform">
             <div className="relative group mx-auto w-fit">
-              <div className="absolute -inset-1 bg-gradient-to-r from-violet-500 to-fuchsia-500 rounded-[2.5rem] blur opacity-20 group-hover:opacity-60 transition duration-1000 group-hover:duration-200" />
               <MagneticButton 
                 onClick={scrollToProjects}
-                className="relative flex items-center justify-center bg-black/60 border border-white/10 hover:border-fuchsia-500/50 px-16 py-8 rounded-2xl text-[11px] font-black uppercase tracking-[0.4em] backdrop-blur-xl transition-all hover:shadow-[0_20px_100px_rgba(217,70,239, 0.15)] group overflow-hidden"
+                className="relative flex items-center justify-center bg-black/60 border border-white/10 hover:border-fuchsia-500/50 px-16 py-8 rounded-2xl text-[11px] font-black uppercase tracking-[0.4em] transition-all duration-300 hover:shadow-[0_20px_100px_rgba(217,70,239,0.15)] group overflow-hidden"
               >
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-                <span className="relative z-10 group-hover:text-fuchsia-500 transition-colors duration-500 uppercase">
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+                <span className="relative z-10 group-hover:text-fuchsia-500 transition-colors duration-300 uppercase">
                   {t.cta}
                 </span>
               </MagneticButton>
             </div>
 
-            <div onClick={scrollToProjects} className="flex flex-col items-center gap-3 opacity-50 hover:opacity-80 transition-opacity cursor-pointer group">
+{/* Scroll Indicator */}
+            <div onClick={scrollToProjects} className="flex flex-col items-center gap-3 opacity-40 hover:opacity-70 transition-opacity cursor-pointer group will-change-transform">
               <span className="text-[9px] uppercase tracking-[1em] font-black text-zinc-400 ml-[1em]">{t.scroll}</span>
-              <div className="w-[1px] h-10 bg-zinc-800 relative overflow-hidden">
+              <div className="w-[1px] h-8 bg-zinc-800 relative overflow-hidden">
                 <motion.div 
-                  animate={{ y: [-40, 40] }} 
+                  animate={{ y: [-32, 32] }} 
                   transition={{ duration: 1.8, repeat: Infinity, ease: "linear" }}
                   className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-transparent via-fuchsia-500/60 to-transparent"
                  />
@@ -656,65 +723,77 @@ export default function App() {
         </motion.div>
       </section>
 
-      {/* Projects Section - Bento Grid */}
-      <section ref={projectsRef} className="relative z-10 py-32 px-6 md:px-16 max-w-7xl mx-auto">
-        <div className="mb-24 flex flex-col items-center">
-            <span className="text-[10px] font-mono font-bold text-violet-400 uppercase tracking-[0.6em] mb-4">{t.portfolioYear}</span>
-            <h2 className="text-4xl md:text-7xl font-display font-black uppercase tracking-tighter text-center">
-              {t.projectsTitle}
-            </h2>
-            <div className="w-16 h-[1px] bg-white/10 mt-8" />
+{/* Projects Section - Bento Grid */}
+      <section ref={projectsRef} className="relative z-10 py-20 md:py-32 px-4 md:px-16 max-w-7xl mx-auto">
+        <div className="mb-16 md:mb-24 flex flex-col items-center">
+          <span className="text-[10px] font-mono font-bold text-violet-400 uppercase tracking-[0.6em] mb-4">{t.portfolioYear}</span>
+          <h2 className="text-3xl md:text-7xl font-display font-black uppercase tracking-tighter text-center">
+            {t.projectsTitle}
+          </h2>
+          <div className="w-16 h-[1px] bg-white/10 mt-6 md:mt-8" />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 lg:gap-14">
-          {PROJECTS_DATA.map((project, idx) => (
+        {/* Category Slider */}
+        <div className="mb-10 md:mb-14 -mt-6 md:-mt-8">
+          <CategorySlider
+            categories={CATEGORIES.map(c => ({ id: c.id, label: c.label[lang] }))}
+            activeId={activeCategory}
+            onSelect={setActiveCategory}
+            isMobile={isMobile}
+          />
+        </div>
+
+        <motion.div 
+          key={activeCategory}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: "circOut" }}
+          className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10 lg:gap-14"
+        >
+          {filteredProjects.map((project, idx) => (
             <ProjectCard 
               key={project.id} 
               project={project} 
               t={t} 
-              isLast={idx === PROJECTS_DATA.length - 1} 
+              isLast={idx === filteredProjects.length - 1} 
               onClick={() => setSelectedProjectId(project.id)}
             />
           ))}
-        </div>
+        </motion.div>
       </section>
 
-      {/* About Section */}
-      <section id="about" className="relative z-10 py-32 px-6 md:px-16 max-w-5xl border-t border-white/5">
+{/* About Section */}
+      <section id="about" className="relative z-10 py-20 md:py-32 px-4 md:px-16 max-w-5xl border-t border-white/5">
         
         {/* Header */}
-        <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} className="flex flex-col gap-4 mb-16">
-          <div className="inline-flex items-center gap-3 px-3 py-1 bg-violet-500/10 border border-violet-500/20 w-fit rounded-full">
-            <div className="w-1 h-1 bg-violet-400 rounded-full" />
-            <span className="text-[10px] font-black uppercase tracking-widest text-violet-400">{t.about}</span>
-          </div>
-          <h2 className="text-6xl md:text-7xl font-display font-black uppercase tracking-tighter leading-none">{t.aboutTitle}</h2>
+        <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} className="flex flex-col gap-4 mb-12 md:mb-16">
+          <h2 className="text-5xl md:text-7xl font-display font-black uppercase tracking-tighter leading-none">{t.aboutTitle}</h2>
         </motion.div>
-
+        
         {/* Bio */}
-        <div className="mb-20">
-          <p className="text-2xl md:text-3xl font-medium text-zinc-300 leading-relaxed mb-8">
+        <div className="mb-16 md:mb-20">
+          <p className="text-xl md:text-2xl font-medium text-zinc-300 leading-relaxed mb-6">
             {t.aboutBio1}
           </p>
-          <p className="text-xl md:text-2xl text-zinc-500 leading-relaxed">
+          <p className="text-base md:text-xl text-zinc-500 leading-relaxed">
             {t.aboutBio2}
           </p>
         </div>
-
+        
         {/* Aptitudes */}
-        <div className="mb-20">
-          <h3 className="text-[13px] font-mono font-black text-zinc-500 uppercase tracking-[0.5em] mb-6">{t.aptitudesTitle}</h3>
+        <div className="mb-16 md:mb-20">
+          <h3 className="text-[12px] md:text-[13px] font-mono font-black text-zinc-500 uppercase tracking-[0.5em] mb-6">{t.aptitudesTitle}</h3>
           <div className="flex flex-wrap gap-2">
             {getSkills(lang).aptitudes.map(s => <SkillBadge key={s} name={s} />)}
             {getSkills(lang).diseno.map(s => <SkillBadge key={s} name={s} />)}
             {getSkills(lang).dev.map(s => <SkillBadge key={s} name={s} />)}
           </div>
         </div>
-
+        
         {/* Experience */}
-        <div className="mb-20">
-          <h3 className="text-[12px] font-mono font-black text-zinc-500 uppercase tracking-[0.5em] mb-8">{t.experienceTitle}</h3>
-          <div className="flex flex-col gap-10">
+        <div className="mb-16 md:mb-20">
+          <h3 className="text-[12px] font-mono font-black text-zinc-500 uppercase tracking-[0.5em] mb-6 md:mb-8">{t.experienceTitle}</h3>
+          <div className="flex flex-col gap-8 md:gap-10">
             <InfoBlock 
               title="Mercedes Benz - Boutique House"
               subtitle={lang === "es" ? "Soporte técnico y mantenimiento de páginas web y sistemas" : "Technical support and maintenance of websites and systems"}
@@ -741,42 +820,42 @@ export default function App() {
             />
           </div>
         </div>
-
+        
         {/* Education */}
         <div>
-          <h3 className="text-[12px] font-mono font-black text-zinc-500 uppercase tracking-[0.5em] mb-8">{t.educationTitle}</h3>
-          <div className="flex flex-col gap-8">
+          <h3 className="text-[12px] font-mono font-black text-zinc-500 uppercase tracking-[0.5em] mb-6 md:mb-8">{t.educationTitle}</h3>
+          <div className="flex flex-col gap-8 md:gap-10">
             <InfoBlock 
-              title={lang === "es" ? "Licenciatura en Tecnología Multimedial" : "Bachelor's Degree in Multimedia Technologies"} 
+              title={lang === "es" ? "Licenciatura en Tecnología Multimedial" : "Bachelor's Degree in Multimedia Technologies"}
               subtitle="Universidad Maimónides" 
               period={lang === "es" ? "4TO AÑO EN CURSO" : "4TH YEAR IN PROGRESS"}
             />
             <InfoBlock 
-              title={lang === "es" ? "Certificaciones" : "Certifications"} 
+              title={lang === "es" ? "Certificaciones" : "Certifications"}
               subtitle={lang === "es" ? "Cambridge B2 / UI UX Figma / Workshop Design" : "Cambridge B2 / UI UX Figma / Workshop Design"}
             />
           </div>
         </div>
-
+        
       </section>
 
       {/* Contact Section */}
-      <section className="relative z-10 py-40 px-6 md:px-16 text-center border-t border-white/5 overflow-hidden">
+      <section className="relative z-10 py-20 md:py-40 px-4 md:px-16 text-center border-t border-white/5 overflow-hidden">
         <motion.div 
           initial={{ opacity: 0, scale: 0.9 }}
           whileInView={{ opacity: 1, scale: 1 }}
           className="relative z-10"
         >
-          <h2 className="text-5xl md:text-8xl font-display font-black uppercase tracking-tighter mb-8 leading-none">
+          <h2 className="text-4xl md:text-8xl font-display font-black uppercase tracking-tighter mb-6 md:mb-8 leading-none">
             {t.contactTitle}
           </h2>
-          <p className="text-zinc-500 max-w-md mx-auto mb-16 text-sm md:text-base leading-relaxed">
+          <p className="text-zinc-500 max-w-md mx-auto mb-12 md:mb-16 text-sm md:text-base leading-relaxed px-4">
             {t.contactSub}
           </p>
           
-          <div className="flex flex-col items-center gap-10">
+          <div className="flex flex-col items-center gap-8 md:gap-10">
             <div className="relative group mx-auto w-fit">
-              <MagneticButton className="relative flex items-center justify-center bg-zinc-900/60 border border-white/20 hover:border-fuchsia-500/50 px-16 py-8 rounded-2xl text-[11px] font-black uppercase tracking-[0.4em] backdrop-blur-xl transition-all hover:shadow-[0_20px_100px_rgba(217,70,239, 0.15)] group overflow-hidden">
+              <MagneticButton className="relative flex items-center justify-center bg-zinc-900/60 border border-white/20 hover:border-fuchsia-500/50 px-10 md:px-16 py-6 md:py-8 rounded-2xl text-[10px] md:text-[11px] font-black uppercase tracking-[0.3em] md:tracking-[0.4em] backdrop-blur-xl transition-all hover:shadow-[0_20px_100px_rgba(217,70,239, 0.15)] group overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
                 <span className="relative z-10 group-hover:text-fuchsia-500 transition-colors duration-500 uppercase">
                   {t.contactCta}
@@ -785,11 +864,11 @@ export default function App() {
             </div>
             
             <div className="flex flex-col items-center gap-2">
-               <span className="text-[11px] font-mono text-zinc-500 uppercase tracking-[0.4em] mb-2">{t.contact}</span>
-               <a href="mailto:felipearespacheco@gmail.com" className="text-base font-mono text-white/50 hover:text-fuchsia-500 transition-colors">
+               <span className="text-[10px] md:text-[11px] font-mono text-zinc-500 uppercase tracking-[0.4em] mb-2">{t.contact}</span>
+               <a href="mailto:felipearespacheco@gmail.com" className="text-sm md:text-base font-mono text-white/50 hover:text-fuchsia-500 transition-colors">
                  felipearespacheco@gmail.com
                </a>
-               <a href={t.whatsappUrl} target="_blank" rel="noopener noreferrer" className="text-base font-mono text-white/50 hover:text-fuchsia-500 transition-colors">
+               <a href={t.whatsappUrl} target="_blank" rel="noopener noreferrer" className="text-sm md:text-base font-mono text-white/50 hover:text-fuchsia-500 transition-colors">
                  +54 911 3420-6387
                </a>
             </div>
@@ -797,17 +876,17 @@ export default function App() {
         </motion.div>
         
         {/* Decorative Background for Contact */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60vw] h-[60vw] bg-violet-500/10 blur-[200px] rounded-full -z-10" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80vw] md:w-[60vw] h-[80vw] md:h-[60vw] bg-violet-500/10 blur-[200px] rounded-full -z-10" />
       </section>
 
 {/* Simplified HUD / Footer */}
-      <footer className="relative z-30 flex flex-col items-center py-20 gap-12 bg-black">
-        <div className="flex items-center gap-16 text-[10px] font-mono font-bold text-zinc-800 uppercase tracking-[0.4em]">
+      <footer className="relative z-30 flex flex-col items-center py-16 md:py-20 gap-8 md:gap-12 bg-black">
+        <div className="flex flex-col md:flex-row items-center gap-8 md:gap-16 text-[9px] md:text-[10px] font-mono font-bold text-zinc-800 uppercase tracking-[0.4em]">
           <div className="flex flex-col items-center gap-2">
             <span className="text-zinc-600">Built with</span>
-            <span className="text-zinc-500">Next.js + React + Motion + Tailwind</span>
+            <span className="text-zinc-500 text-center">Next.js + React + Motion + Tailwind</span>
           </div>
-          <div className="h-8 w-[1px] bg-zinc-900" />
+          <div className="hidden md:block h-8 w-[1px] bg-zinc-900" />
           <div className="flex flex-col items-center gap-2">
             <span className="text-zinc-600">Location</span>
             <span className="text-zinc-500">Buenos Aires, Argentina</span>
@@ -831,7 +910,7 @@ export default function App() {
           <ProjectDetail 
             project={selectedProject} 
             t={t} 
-            onBack={() => setSelectedProjectId(null)} 
+            onBack={handleBack} 
             onNext={handleNextProject}
           />
         )}
